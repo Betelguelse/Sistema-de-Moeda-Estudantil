@@ -1,7 +1,14 @@
+
 import { eq } from 'drizzle-orm';
 import { db } from '..';
 import { alunoT, type InsertAluno, type SelectAluno } from './schema';
 import { user } from '../auth-schema';
+
+function validarAlunoInput(info: InsertAluno) {
+	if (!info.cpf || !info.curso || !info.user_id) {
+		throw new Error('CPF, curso e user_id são obrigatórios');
+	}
+}
 
 export const alunoModel = {
 	listar: async () => {
@@ -17,13 +24,13 @@ export const alunoModel = {
 			where: eq(alunoT.id, id)
 		});
 	},
-	criar: async (info: InsertAluno) => {
-		return await db.transaction(async (tx) => {
-			await tx.insert(alunoT).values(info).returning();
-
-			return await tx.update(user).set({ role: 'estudante' }).where(eq(user.id, info.user_id)).returning();
-		})
-	},
+	       criar: async (info: InsertAluno) => {
+		       validarAlunoInput(info);
+		       return await db.transaction(async (tx) => {
+			       await tx.insert(alunoT).values(info).returning();
+			       return await tx.update(user).set({ role: 'estudante' }).where(eq(user.id, info.user_id)).returning();
+		       })
+	       },
 	atualizar: async (id: SelectAluno['id'], newInfo: Partial<InsertAluno>) => {
 		return await db.update(alunoT).set(newInfo).where(eq(alunoT.id, id));
 	},
