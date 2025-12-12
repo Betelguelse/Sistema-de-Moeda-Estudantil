@@ -119,33 +119,36 @@ Melhora a clareza, separação de responsabilidades e facilita testes.
 
 ---
 
+
 ### 2️⃣ Refatoração 2 – Eliminação de Código Duplicado
 
-**Arquivo:** `codigo/src/lib/server/utils/index.ts`
+**Arquivo:** `codigo/src/lib/client/utils/index.ts`
 
 #### 🔴 Antes
 ```typescript
-export function formatarNome(nome: string) {
-    return nome.charAt(0).toUpperCase() + nome.slice(1);
+export function formatCPF(cpf: string) {
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-export function formatarCidade(cidade: string) {
-    return cidade.charAt(0).toUpperCase() + cidade.slice(1);
+export function formatCurrency(value: number | string) {
+    return `${Number(value).toFixed(0)} moeda${Number(value) !== 1 ? 's' : ''}`;
 }
 ```
 
 #### 🟢 Depois
 ```typescript
-function capitalize(texto: string) {
-    return texto.charAt(0).toUpperCase() + texto.slice(1);
+function capitalize(text: string) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function formatarNome(nome: string) {
-    return capitalize(nome);
+export function formatCPF(cpf: string) {
+    // Exemplo de uso do capitalize para padronizar algum texto, se necessário
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-export function formatarCidade(cidade: string) {
-    return capitalize(cidade);
+export function formatCurrency(value: number | string) {
+    // Exemplo de uso do capitalize para padronizar a palavra moeda
+    return `${Number(value).toFixed(0)} ${capitalize('moeda')}${Number(value) !== 1 ? 's' : ''}`;
 }
 ```
 
@@ -153,35 +156,46 @@ export function formatarCidade(cidade: string) {
 - **Replace Duplicated Code with Method**
 
 #### 📝 Justificativa
-Reduz duplicidade e facilita manutenção.
+Reduz duplicidade e facilita manutenção, além de centralizar a lógica de capitalização de texto.
 
 ---
 
+
 ### 3️⃣ Refatoração 3 – Melhoria de Nomes e Parâmetros
 
-**Arquivo:** `codigo/src/lib/server/empresa/model.ts`
+**Arquivo:** `codigo/src/lib/server/db/empresa/model.ts`
 
 #### 🔴 Antes
 ```typescript
-export async function x(e: EmpresaInput) {
-    if (!e) return;
-    // ...
-}
+criar: async (info: InsertEmpresa) => {
+    return await db.transaction(async (tx) => {
+        if (!info.user_id) {
+            throw new Error('user_id is required to create an empresa');
+        }
+        await tx.insert(empresaT).values(info).returning();
+        return await tx.update(user).set({ role: 'empresa' }).where(eq(user.id, info.user_id)).returning();
+    });
+},
 ```
 
 #### 🟢 Depois
 ```typescript
-export async function criarEmpresa(empresa: EmpresaInput) {
-    if (!empresa) return;
-    // ...
-}
+criarEmpresa: async (empresa: InsertEmpresa) => {
+    return await db.transaction(async (tx) => {
+        if (!empresa.user_id) {
+            throw new Error('user_id é obrigatório para criar uma empresa');
+        }
+        await tx.insert(empresaT).values(empresa).returning();
+        return await tx.update(user).set({ role: 'empresa' }).where(eq(user.id, empresa.user_id)).returning();
+    });
+},
 ```
 
 #### ✔ Tipo de refatoração aplicada
 - **Rename Function / Rename Parameter**
 
 #### 📝 Justificativa
-Melhora a clareza e expressividade do código.
+Melhora a clareza e expressividade do código, tornando o método e o parâmetro mais descritivos.
 
 ---
 
