@@ -18,7 +18,7 @@
   | 👤 Integrante | 🔧 Refatoração | 🔗 Link do PR |
   |--------------|---------------|----------------|
   | <a href="https://github.com/arthur-am">Arthur Araujo Mendonca</a> | Extração de Função de Validação |  <a href="https://github.com/pedroseabra27/Sistema-de-Moeda-Estudantil/pull/1">Refatoração 1</a> |
-  | <a href="https://github.com/betelguelse">Eddie Christian</a> | Eliminação de Código Duplicado | [A definir] |
+  | <a href="https://github.com/betelguelse">Eddie Christian</a> | Eliminação de Código Duplicado | <a href="https://github.com/arthur-am/Sistema-de-Moeda-Estudantil/pull/1">Refatoração 2 |
   | <a href="https://github.com/pedroqr">Pedro Queiroz</a> | Melhoria de Nomes e Parâmetros | [A definir] |
 
 ---
